@@ -110,7 +110,7 @@ def main():
 	try:
 		# 1. Check if 'trans' command is available
 		if not is_command_available("trans"):
-			raise ScriptError("Fallback tool 'trans' not found. Please install 'trans-shell'.")
+			raise ScriptError("Fallback tool 'trans' not found. Please install 'translate-shell'.")
 
 		# 2. Get content from clipboard
 		processed_text = get_clipboard_text()
