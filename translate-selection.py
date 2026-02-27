@@ -10,34 +10,16 @@ import json
 CONFIG = {
 	"NOTIFICATION_TITLE": "Translated",
 	"LIBRETRANSLATE_URL": "http://localhost:5000/translate",
-	"SOURCE_LANG": "en", # Можно использовать "auto", если хочешь автоопределение
+	"SOURCE_LANG": "en", 
 	"TARGET_LANG": "ru"
 }
 # ==============================================================================
 
-
-# --- Path Construction and Validation ---
-# (This section is now removed, as we don't need venv or the other script)
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
-
-# --- Custom Exception ---
 class ScriptError(Exception):
 	"""Custom exception for script-specific errors."""
 	pass
-
-
-# --- Helper Functions ---
-
-def is_command_available(command):
-	"""
-	Checks if a command-line tool is available in the system's PATH.
-	Args:
-		command (str): The name of the command to check (e.g., "trans").
-	Returns:
-		bool: True if the command is found, False otherwise.
-	"""
-	return shutil.which(command) is not None
 
 def run_command(command, input_data=None, capture_output=True, text=True, check=True):
 	"""
@@ -55,58 +37,23 @@ def run_command(command, input_data=None, capture_output=True, text=True, check=
 	except Exception as e:
 		raise ScriptError(f"Command `{' '.join(command)}` failed: {str(e)}")
 
-# (run_command_popen function removed)
-
 def get_clipboard_text():
 	"""
 	Retrieves text from the Wayland clipboard.
 	"""
 	print("Getting clipboard content (trying primary selection)...")
-	paste_process = run_command(["wl-paste", "-p"])
-	content = paste_process.stdout.strip()
+	paste_process = run_command(["wl-paste", "-p"], check=False)
+	content = paste_process.stdout.strip() if paste_process.stdout else ""
 
 	if not content:
 		print("Primary selection empty, trying regular clipboard...")
-		paste_process = run_command(["wl-paste"])
-		content = paste_process.stdout.strip()
+		paste_process = run_command(["wl-paste"], check=False)
+		content = paste_process.stdout.strip() if paste_process.stdout else ""
 	
 	if content:
 		return " ".join(content.splitlines())
 	
 	return None
-
-# (stream_translation function removed)
-
-# (stream_and_notify function removed)
-
-def translate_with_trans_shell(text_to_translate):
-	"""
-	Translates the given text using the 'trans-shell' command-line tool.
-
-	Args:
-		text_to_translate (str): The text to be translated.
-
-	Returns:
-		str: The translated text.
-
-	Raises:
-		ScriptError: If the 'trans' command fails or returns an empty result.
-	"""
-	print("\n--- Attempting translation with 'trans-shell'... ---")
-	
-	# The command to run. '-b' stands for "brief" mode, which gives only the translation.
-	command = ["trans", "-b", text_to_translate]
-	
-	# Use the existing run_command helper to execute the translation
-	process = run_command(command)
-	
-	translated_text = process.stdout.strip()
-	
-	if not translated_text:
-		raise ScriptError("'trans-shell' returned an empty result.")
-		
-	print(f"Translation successful.") # Updated print statement
-	return translated_text
 
 def translate_with_libre(text_to_translate):
 	"""
@@ -114,7 +61,6 @@ def translate_with_libre(text_to_translate):
 	"""
 	print("\n--- Attempting translation with LibreTranslate... ---")
 	
-	# Подготавливаем данные для отправки, точно как в твоем curl-запросе
 	data = {
 		"q": text_to_translate,
 		"source": CONFIG["SOURCE_LANG"],
@@ -122,10 +68,8 @@ def translate_with_libre(text_to_translate):
 		"format": "text"
 	}
 	
-	# Превращаем наши данные в JSON и кодируем для отправки по сети
 	data_encoded = json.dumps(data).encode('utf-8')
 	
-	# Формируем POST-запрос
 	req = urllib.request.Request(
 		CONFIG["LIBRETRANSLATE_URL"], 
 		data=data_encoded, 
@@ -133,9 +77,7 @@ def translate_with_libre(text_to_translate):
 	)
 	
 	try:
-		# Отправляем запрос и ждем ответ
 		with urllib.request.urlopen(req) as response:
-			# Читаем ответ и превращаем его обратно из JSON в словарь Python
 			result = json.loads(response.read().decode('utf-8'))
 			translated_text = result.get("translatedText", "")
 			
@@ -183,5 +125,3 @@ def main():
 
 if __name__ == "__main__":
 	main()
-
-
