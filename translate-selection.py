@@ -153,38 +153,33 @@ def main():
 	"""Main function to execute the translation pipeline."""
 	
 	try:
-		# 1. Check if 'trans' command is available
-		if not is_command_available("trans"):
-			raise ScriptError("Fallback tool 'trans' not found. Please install 'translate-shell'.")
-
-		# 2. Get content from clipboard
+		# 1. Получаем текст из буфера обмена
 		processed_text = get_clipboard_text()
 		if not processed_text:
 			print("No content found in clipboard to translate.")
 			subprocess.run(["notify-send", "Translation", "No text selected or copied."])
 			return
 
-		# 3. Perform the translation
-		translated_text = translate_with_trans_shell(processed_text)
+		# 2. Выполняем перевод через локальный LibreTranslate
+		translated_text = translate_with_libre(processed_text)
 
-		# 4. Send a single notification for the result
+		# 3. Отправляем уведомление с результатом
 		print("Sending notification...")
 		title = CONFIG["NOTIFICATION_TITLE"]
 		run_command(["notify-send", title, translated_text], check=False)
 
-		# 5. Copy the result to the clipboard
+		# 4. Копируем результат обратно в буфер обмена
 		if translated_text:
 			print("Copying final translated text to clipboard...")
 			run_command(["wl-copy"], input_data=translated_text, capture_output=False)
 			print("Done.")
 
 	except ScriptError as e:
-		# This block runs if any step in the 'try' block fails.
+		# Этот блок сработает, если сервер недоступен или возникла другая ошибка
 		error_message = str(e)
 		print(f"Operation failed: {error_message}")
 		subprocess.run(["notify-send", "-u", "critical", "Translation Failed", error_message])
 		return
-
 
 if __name__ == "__main__":
 	main()
