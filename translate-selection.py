@@ -7,6 +7,9 @@ import shutil
 # ==============================================================================
 CONFIG = {
 	"NOTIFICATION_TITLE": "Translated",
+	"LIBRETRANSLATE_URL": "http://localhost:5000/translate",
+	"SOURCE_LANG": "en", # Можно использовать "auto", если хочешь автоопределение
+	"TARGET_LANG": "ru"
 }
 # ==============================================================================
 
