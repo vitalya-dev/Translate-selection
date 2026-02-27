@@ -108,6 +108,46 @@ def translate_with_trans_shell(text_to_translate):
 	print(f"Translation successful.") # Updated print statement
 	return translated_text
 
+def translate_with_libre(text_to_translate):
+	"""
+	Переводит текст с помощью локального API LibreTranslate.
+	"""
+	print("\n--- Attempting translation with LibreTranslate... ---")
+	
+	# Подготавливаем данные для отправки, точно как в твоем curl-запросе
+	data = {
+		"q": text_to_translate,
+		"source": CONFIG["SOURCE_LANG"],
+		"target": CONFIG["TARGET_LANG"],
+		"format": "text"
+	}
+	
+	# Превращаем наши данные в JSON и кодируем для отправки по сети
+	data_encoded = json.dumps(data).encode('utf-8')
+	
+	# Формируем POST-запрос
+	req = urllib.request.Request(
+		CONFIG["LIBRETRANSLATE_URL"], 
+		data=data_encoded, 
+		headers={'Content-Type': 'application/json'}
+	)
+	
+	try:
+		# Отправляем запрос и ждем ответ
+		with urllib.request.urlopen(req) as response:
+			# Читаем ответ и превращаем его обратно из JSON в словарь Python
+			result = json.loads(response.read().decode('utf-8'))
+			translated_text = result.get("translatedText", "")
+			
+			if not translated_text:
+				raise ScriptError("LibreTranslate вернул пустой результат.")
+				
+			print("Translation successful.")
+			return translated_text
+            
+	except Exception as e:
+		raise ScriptError(f"Ошибка при запросе к LibreTranslate: {str(e)}")
+
 # --- Main Logic ---
 def main():
 	"""Main function to execute the translation pipeline."""
