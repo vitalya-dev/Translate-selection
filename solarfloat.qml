@@ -10,7 +10,7 @@ Window {
     readonly property color base1: "#93a1a1"
     readonly property color base01: "#586e75"
     readonly property color blue: "#268bd2"
-    property int currentFontSize: 16
+    property int currentFontSize: 24
 
     visible: true
     width: 900
