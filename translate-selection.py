@@ -11,7 +11,8 @@ CONFIG = {
 	"NOTIFICATION_TITLE": "Translated",
 	"LIBRETRANSLATE_URL": "http://localhost:5000/translate",
 	"SOURCE_LANG": "en", 
-	"TARGET_LANG": "ru"
+	"TARGET_LANG": "ru",
+	"QML_APP_PATH": "solarfloat.qml"
 }
 # ==============================================================================
 
