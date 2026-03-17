@@ -12,7 +12,7 @@ CONFIG = {
 	"LIBRETRANSLATE_URL": "http://localhost:5000/translate",
 	"SOURCE_LANG": "en", 
 	"TARGET_LANG": "ru",
-	"QML_APP_PATH": "/home/vitalya/Projects/SolarFloat/solarfloat.qml"
+	"QML_APP_PATH": "/home/vitalya/Projects/Translate-selection/solarfloat.qml"
 }
 # ==============================================================================
 
@@ -109,11 +109,6 @@ def main():
 		print("Sending to QML app...")
 		run_command(["env", "QT_QPA_PLATFORM=xcb", "qml", CONFIG["QML_APP_PATH"], "--", translated_text], check=False)
 
-		# 4. Копируем результат обратно в буфер обмена
-		if translated_text:
-			print("Copying final translated text to clipboard...")
-			run_command(["wl-copy"], input_data=translated_text, capture_output=False)
-			print("Done.")
 
 	except ScriptError as e:
 		# Этот блок сработает, если сервер недоступен или возникла другая ошибка
