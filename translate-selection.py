@@ -12,7 +12,7 @@ CONFIG = {
 	"LIBRETRANSLATE_URL": "http://localhost:5000/translate",
 	"SOURCE_LANG": "en", 
 	"TARGET_LANG": "ru",
-	"QML_APP_PATH": "solarfloat.qml"
+	"QML_APP_PATH": "/home/vitalya/Projects/SolarFloat/solarfloat.qml"
 }
 # ==============================================================================
 
@@ -91,7 +91,6 @@ def translate_with_libre(text_to_translate):
 	except Exception as e:
 		raise ScriptError(f"Ошибка при запросе к LibreTranslate: {str(e)}")
 
-# --- Main Logic ---
 def main():
 	"""Main function to execute the translation pipeline."""
 	
@@ -106,10 +105,9 @@ def main():
 		# 2. Выполняем перевод через локальный LibreTranslate
 		translated_text = translate_with_libre(processed_text)
 
-		# 3. Отправляем уведомление с результатом
-		print("Sending notification...")
-		title = CONFIG["NOTIFICATION_TITLE"]
-		run_command(["notify-send", title, translated_text], check=False)
+		# 3. Открываем QML-приложение с результатом
+		print("Sending to QML app...")
+		run_command(["env", "QT_QPA_PLATFORM=xcb", "qml", CONFIG["QML_APP_PATH"], "--", translated_text], check=False)
 
 		# 4. Копируем результат обратно в буфер обмена
 		if translated_text:
