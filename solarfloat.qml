@@ -86,7 +86,7 @@ Window {
                     focus: true
                     selectByMouse: true
                     wrapMode: TextEdit.Wrap
-                    font.family: "Calibri"
+                    font.family: "Merriweather"
                     font.pixelSize: currentFontSize
                     font.weight: Font.DemiBold
                     color: base01 // Правильный цвет текста
