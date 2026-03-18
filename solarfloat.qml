@@ -15,13 +15,13 @@ Window {
     visible: true
     width: 900
     height: 600
-    flags: Qt.FramelessWindowHint | Qt.Window
+    // Добавлен флаг Qt.WindowStaysOnTopHint
+    flags: Qt.FramelessWindowHint | Qt.Window | Qt.WindowStaysOnTopHint
     color: base3 // Используем основной цвет фона
     Component.onCompleted: {
         var args = Qt.application.arguments;
         if (args.length >= 3)
             editor.text = args[args.length - 1];
-
     }
 
     Row {
@@ -122,7 +122,6 @@ Window {
         onActivated: {
             if (currentFontSize < 70)
                 currentFontSize += 2;
-
         }
     }
 
@@ -131,7 +130,6 @@ Window {
         onActivated: {
             if (currentFontSize > 6)
                 currentFontSize -= 2;
-
         }
     }
 
