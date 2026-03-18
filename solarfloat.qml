@@ -111,6 +111,15 @@ Window {
 
     }
 
+    // 3. РАМКА ВОКРУГ ОКНА (НОВЫЙ БЛОК)
+    Rectangle {
+        anchors.fill: parent
+        color: "transparent" // Внутри прозрачно, чтобы видеть редактор
+        border.color: base01 // Цвет рамки
+        border.width: 2      // Толщина рамки (можно менять!)
+        z: 10                // Гарантируем, что рамка рисуется поверх всего остального
+    }
+
     // Горячие клавиши
     Shortcut {
         sequence: "Escape"
