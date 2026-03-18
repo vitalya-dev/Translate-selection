@@ -3,6 +3,7 @@ import os
 import shutil
 import urllib.request
 import json
+import re
 
 # ==============================================================================
 # --- CONFIGURATION ---
@@ -90,6 +91,24 @@ def translate_with_libre(text_to_translate):
             
 	except Exception as e:
 		raise ScriptError(f"Ошибка при запросе к LibreTranslate: {str(e)}")
+
+def preprocess_text(text):
+	"""
+	Очищает текст от переносов слов и форматирует пробелы.
+	"""
+	if not text:
+		return text
+		
+	# 1. Убираем переносы слов: дефис, за которым следует перенос строки.
+	# \s* позволяет учитывать случайные невидимые пробелы до или после переноса.
+	text = re.sub(r'-\s*\n\s*', '', text)
+	
+	# 2. Заменяем все оставшиеся переносы строк и множественные пробелы на один пробел.
+	text = re.sub(r'\s+', ' ', text)
+	
+	# 3. Убираем лишние пробелы в начале и в конце текста.
+	return text.strip()
+
 
 def main():
 	"""Main function to execute the translation pipeline."""
