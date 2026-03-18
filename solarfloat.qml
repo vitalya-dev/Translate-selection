@@ -17,11 +17,18 @@ Window {
     height: 600
     flags: Qt.FramelessWindowHint | Qt.Window | Qt.WindowStaysOnTopHint
     color: base3 // Используем основной цвет фона
+    
     Component.onCompleted: {
         var args = Qt.application.arguments;
         if (args.length >= 3)
             editor.text = args[args.length - 1];
+    }
 
+    // НОВЫЙ БЛОК: Автоматическое закрытие при потере фокуса
+    onActiveChanged: {
+        if (!active) {
+            Qt.quit();
+        }
     }
 
     Row {
@@ -111,12 +118,12 @@ Window {
 
     }
 
-    // 3. РАМКА ВОКРУГ ОКНА (НОВЫЙ БЛОК)
+    // 3. РАМКА ВОКРУГ ОКНА
     Rectangle {
         anchors.fill: parent
         color: "transparent" // Внутри прозрачно, чтобы видеть редактор
         border.color: base01 // Цвет рамки
-        border.width: 2      // Толщина рамки (можно менять!)
+        border.width: 2      // Толщина рамки
         z: 10                // Гарантируем, что рамка рисуется поверх всего остального
     }
 
