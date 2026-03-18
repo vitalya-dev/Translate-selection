@@ -53,7 +53,8 @@ def get_clipboard_text():
 		content = paste_process.stdout.strip() if paste_process.stdout else ""
 	
 	if content:
-		return " ".join(content.splitlines())
+		# Возвращаем сырой текст со всеми \n, чтобы preprocess_text мог с ним поработать
+		return content
 	
 	return None
 
@@ -108,7 +109,7 @@ def preprocess_text(text):
 	# 3. Убираем сноски: числа от 1 до 3 цифр, идущие после точки.
 	# (\.) захватывает точку, \s+ это пробелы, \d{1,3} это цифры. 
 	# Заменяем на \1 (сохраненную точку) и один пробел.
-	text = re.sub(r'(\.)\s+\d{1,3}\s+', r'\1 ', text)
+	text = re.sub(r'(\.)\s*\d{1,3}\s+', r'\1 ', text)
 	
 	# 4. Убираем лишние пробелы в начале и в конце текста.
 	return text.strip()
@@ -118,20 +119,22 @@ def main():
 	"""Main function to execute the translation pipeline."""
 	
 	try:
-		# 1. Получаем текст из буфера обмена
-		processed_text = get_clipboard_text()
-		if not processed_text:
+		# 1. Получаем сырой текст из буфера обмена
+		raw_text = get_clipboard_text()
+		if not raw_text:
 			print("No content found in clipboard to translate.")
 			subprocess.run(["notify-send", "Translation", "No text selected or copied."])
 			return
 
-		# 2. Выполняем перевод через локальный LibreTranslate
+		# 2. Очищаем текст от переносов и сносок
+		processed_text = preprocess_text(raw_text)
+
+		# 3. Выполняем перевод через локальный LibreTranslate
 		translated_text = translate_with_libre(processed_text)
 
-		# 3. Открываем QML-приложение с результатом
+		# 4. Открываем QML-приложение с результатом
 		print("Sending to QML app...")
 		run_command(["env", "QT_QPA_PLATFORM=xcb", "qml", CONFIG["QML_APP_PATH"], "--", translated_text], check=False)
-
 
 	except ScriptError as e:
 		# Этот блок сработает, если сервер недоступен или возникла другая ошибка
