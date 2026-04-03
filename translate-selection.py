@@ -143,11 +143,30 @@ def main():
 		# 2. Очищаем текст от переносов и сносок
 		processed_text = preprocess_text(raw_text)
 
-		# 3. Выполняем перевод через локальный LibreTranslate
-		translated_text = translate_with_libre(processed_text)
+		# 3. Разбиваем текст на отдельные предложения
+		sentences = split_into_sentences(processed_text)
+		if not sentences:
+			return
 
-		# 4. Временно выводим в консоль, пока не реализуем потоковую запись
-		print("Переведенный текст:", translated_text)
+		# 4. Открываем лог-файл в режиме добавления ("a") и переводим по частям
+		print(f"Starting stream translation to {CONFIG['LOG_FILE']}...")
+		
+		with open(CONFIG["LOG_FILE"], "a", encoding="utf-8") as log_file:
+			# Добавляем разделитель для удобства чтения в tail -f
+			log_file.write("\n\n--- Новый перевод ---\n")
+			log_file.flush()
+			
+			for sentence in sentences:
+				translated_sentence = translate_with_libre(sentence)
+				
+				# Записываем переведенное предложение с пробелом
+				log_file.write(translated_sentence + " ")
+				# Принудительно сбрасываем буфер, чтобы tail -f сразу показал текст
+				log_file.flush()
+				
+				print(f"Translated chunk: {translated_sentence}")
+				
+		subprocess.run(["notify-send", "Translation", "Finished streaming to log."])
 
 	except ScriptError as e:
 		# Этот блок сработает, если сервер недоступен или возникла другая ошибка
