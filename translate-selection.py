@@ -114,6 +114,20 @@ def preprocess_text(text):
 	# 4. Убираем лишние пробелы в начале и в конце текста.
 	return text.strip()
 
+def split_into_sentences(text):
+	"""
+	Разбивает сплошной текст на отдельные предложения.
+	"""
+	if not text:
+		return []
+		
+	# Разбиваем текст по пробелам, которым предшествует точка, восклицательный или вопросительный знак.
+	# Используем позитивный просмотр назад (?<=[.!?]), чтобы знаки препинания оставались в конце предложений.
+	sentences = re.split(r'(?<=[.!?])\s+', text.strip())
+	
+	# Возвращаем список, отфильтровав пустые строки (на всякий случай)
+	return [s for s in sentences if s]
+
 
 def main():
 	"""Main function to execute the translation pipeline."""
