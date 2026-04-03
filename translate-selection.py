@@ -13,7 +13,7 @@ CONFIG = {
 	"LIBRETRANSLATE_URL": "http://localhost:5000/translate",
 	"SOURCE_LANG": "en", 
 	"TARGET_LANG": "ru",
-	"QML_APP_PATH": "/home/vitalya/Projects/Translate-selection/solarfloat.qml"
+	"LOG_FILE": "/tmp/translation_stream.log"
 }
 # ==============================================================================
 
@@ -132,9 +132,8 @@ def main():
 		# 3. Выполняем перевод через локальный LibreTranslate
 		translated_text = translate_with_libre(processed_text)
 
-		# 4. Открываем QML-приложение с результатом
-		print("Sending to QML app...")
-		run_command(["env", "QT_QPA_PLATFORM=xcb", "qml", CONFIG["QML_APP_PATH"], "--", translated_text], check=False)
+		# 4. Временно выводим в консоль, пока не реализуем потоковую запись
+		print("Переведенный текст:", translated_text)
 
 	except ScriptError as e:
 		# Этот блок сработает, если сервер недоступен или возникла другая ошибка
