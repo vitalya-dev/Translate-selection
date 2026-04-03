@@ -175,8 +175,13 @@ def main():
 			for sentence in sentences:
 				translated_sentence = translate_with_libre(sentence)
 				
-				# Записываем переведенное предложение с пробелом
-				log_file.write(translated_sentence + " ")
+				# Форматируем текст: ограничиваем длину строки 75 символами
+				# textwrap.fill сам аккуратно расставит переносы по словам
+				wrapped_sentence = textwrap.fill(translated_sentence, width=75)
+				
+				# Записываем переведенное и отформатированное предложение с новой строки
+				log_file.write(wrapped_sentence + "\n")
+				
 				# Принудительно сбрасываем буфер, чтобы tail -f сразу показал текст
 				log_file.flush()
 				
