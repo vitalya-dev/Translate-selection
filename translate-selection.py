@@ -160,7 +160,10 @@ def main():
 		if not sentences:
 			return
 
-		# 4. Открываем лог-файл в режиме добавления ("a") и переводим по частям
+		# 4. Вызываем Yakuake, чтобы показать терминал
+		show_yakuake()
+
+		# 5. Открываем лог-файл в режиме добавления ("a") и переводим по частям
 		print(f"Starting stream translation to {CONFIG['LOG_FILE']}...")
 		
 		with open(CONFIG["LOG_FILE"], "a", encoding="utf-8") as log_file:
