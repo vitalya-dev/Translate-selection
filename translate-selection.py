@@ -39,6 +39,18 @@ def run_command(command, input_data=None, capture_output=True, text=True, check=
 	except Exception as e:
 		raise ScriptError(f"Command `{' '.join(command)}` failed: {str(e)}")
 
+def show_yakuake():
+	"""
+	Отправляет команду через D-Bus для вызова окна Yakuake.
+	"""
+	print("Вызов Yakuake...")
+	# Вызываем Yakuake с помощью qdbus. Игнорируем ошибки (check=False), 
+	# чтобы скрипт не упал, если Yakuake вдруг закрыт.
+	run_command(
+		["qdbus6", "org.kde.yakuake", "/yakuake/window", "org.kde.yakuake.toggleWindowState"],
+		check=False
+	)
+
 def get_clipboard_text():
 	"""
 	Retrieves text from the Wayland clipboard.
