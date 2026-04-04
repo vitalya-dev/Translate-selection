@@ -172,17 +172,27 @@ def main():
 			log_file.write("\n\n--- Новый перевод ---\n")
 			log_file.flush()
 			
+			max_line_length = 75
+			current_line_length = 0
+			
 			for sentence in sentences:
 				translated_sentence = translate_with_libre(sentence)
 				
-				# Форматируем текст: ограничиваем длину строки 75 символами
-				# textwrap.fill сам аккуратно расставит переносы по словам
-				wrapped_sentence = textwrap.fill(translated_sentence, width=75)
+				# Разбиваем переведенное предложение на слова
+				words = translated_sentence.split()
 				
-				# Записываем переведенное и отформатированное предложение с новой строки
-				log_file.write(wrapped_sentence + "\n")
+				for word in words:
+					# Проверяем, поместится ли слово в текущей строке (учитывая пробел)
+					if current_line_length + len(word) + 1 > max_line_length:
+						log_file.write("\n")
+						current_line_length = 0
+						
+					# Записываем слово и пробел
+					log_file.write(word + " ")
+					current_line_length += len(word) + 1
 				
-				# Принудительно сбрасываем буфер, чтобы tail -f сразу показал текст
+				# Принудительно сбрасываем буфер после каждого предложения,
+				# чтобы tail -f сразу показал новый кусок текста
 				log_file.flush()
 				
 				print(f"Translated chunk: {translated_sentence}")
