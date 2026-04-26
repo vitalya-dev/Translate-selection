@@ -164,47 +164,48 @@ def main():
 		# 4. Вызываем Yakuake, чтобы показать терминал
 		show_yakuake()
 
-		# 5. Открываем лог-файл в режиме добавления ("a") и переводим по частям
+		# 5. Открываем лог-файл в режиме добавления ("a") и переводим чанками
 		print(f"Starting stream translation to {CONFIG['LOG_FILE']}...")
 		
 		with open(CONFIG["LOG_FILE"], "a", encoding="utf-8") as log_file:
-			# Добавляем разделитель для удобства чтения в tail -f
 			log_file.write("\n\n--- Новый перевод ---\n")
 			log_file.flush()
 			
 			max_line_length = 75
 			current_line_length = 0
+			chunk_size = 3 # Количество предложений в одном запросе
 			
-			for sentence in sentences:
-				translated_sentence = translate_with_libre(sentence)
+			# Идем по списку предложений с шагом chunk_size (по 3)
+			for i in range(0, len(sentences), chunk_size):
+				# Берем срез списка (от i до i + 3) и склеиваем в один текст через пробел
+				chunk = sentences[i:i + chunk_size]
+				text_to_translate = " ".join(chunk)
 				
-				# Разбиваем переведенное предложение на слова
-				words = translated_sentence.split()
+				# Отправляем весь чанк в LibreTranslate
+				translated_chunk = translate_with_libre(text_to_translate)
+				
+				# Разбиваем переведенный кусок на слова для красивого вывода
+				words = translated_chunk.split()
 				
 				for word in words:
-					# Проверяем, поместится ли слово в текущей строке (учитывая пробел)
 					if current_line_length + len(word) + 1 > max_line_length:
 						log_file.write("\n")
 						current_line_length = 0
 						
-					# Записываем слово и пробел
 					log_file.write(word + " ")
 					current_line_length += len(word) + 1
 				
-				# Принудительно сбрасываем буфер после каждого предложения,
-				# чтобы tail -f сразу показал новый кусок текста
+				# Сбрасываем буфер после каждого переведенного чанка
 				log_file.flush()
 				
-				print(f"Translated chunk: {translated_sentence}")
+				print(f"Translated chunk: {translated_chunk}")
 				
 		subprocess.run(["notify-send", "Translation", "Finished streaming to log."])
 
 	except ScriptError as e:
-		# Этот блок сработает, если сервер недоступен или возникла другая ошибка
 		error_message = str(e)
 		print(f"Operation failed: {error_message}")
 		subprocess.run(["notify-send", "-u", "critical", "Translation Failed", error_message])
 		return
-
 if __name__ == "__main__":
 	main()
